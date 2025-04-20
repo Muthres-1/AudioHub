@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎧 AudioHub – Audio Feedback Platform
 
-## Getting Started
+AudioHub is a full-stack audio sharing platform that allows users to upload audio files, play them through a clean UI, and collect feedback from listeners. Once a user finishes listening to an audio clip, they are prompted to provide feedback, which is automatically sent to the original uploader via email using EmailJS.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Features
+
+- 🔒 Firebase Authentication & Firestore integration
+- 🎵 Audio player with real-time streaming
+- 📝 Feedback system after audio playback ends
+- 📧 Email notifications to audio owners using EmailJS
+- 🎨 Clean and responsive UI with Tailwind CSS
+- 🌐 Routing with Next.js App Router
+
+---
+
+## 🛠️ Technologies Used
+
+- **Next.js (App Router)**
+- **Firebase (Firestore)**
+- **EmailJS**
+- **TypeScript**
+- **Tailwind CSS**
+
+---
+
+## 📂 Project Structure
+
+```
+📦 AudioHub
+ ┣ 📁 app
+ ┃ ┣ 📁 dashboard              → User dashboard interface
+ ┃ ┣ 📁 AudioPlayerAndFeedback → Audio player + feedback form
+ ┃ ┣ 📁 handleSubmitFeedback   → EmailJS logic to send feedback
+ ┃ ┗ 📄 layout.tsx             → Shared layout for all pages
+ ┃   globals.css              → Global Tailwind styles
+ ┣ 📄 firebaseConfig.ts        → Firebase setup and export
+ ┣ 📄 tailwind.config.ts       → Tailwind CSS configuration
+ ┣ 📄 README.md                → Project overview and setup guide
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔧 Setup Instructions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Clone the Repo
 
-## Learn More
+```bash
+git clone https://github.com/your-username/AudioHub.git
+cd AudioHub
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Install Dependencies
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Configure Firebase
 
-## Deploy on Vercel
+Create a `firebaseConfig.ts` file with your Firebase credentials:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```ts
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+export { db };
+```
+
+### 4. Set up EmailJS
+
+Create an account on [EmailJS](https://www.emailjs.com/) and configure:
+
+- **Service ID**
+- **Template ID**
+- **Public API Key**
+
+Your email template must accept these fields:
+
+```txt
+to_email
+to_name
+audio_title
+feedback_message
+```
+
+Update your `handleSubmitFeedback/page.tsx`:
+
+```ts
+emailjs.send(
+  'YOUR_SERVICE_ID',
+  'YOUR_TEMPLATE_ID',
+  {
+    to_email: ownerData.email,
+    to_name: ownerData.displayName || "Audio Owner",
+    feedback_message: feedback,
+    audio_title: audio.title,
+  },
+  'YOUR_PUBLIC_KEY'
+);
+```
+
+---
+
+## ✅ Usage
+
+1. User plays audio
+2. After completion, a feedback form appears
+3. On submit, feedback is stored in Firestore and emailed to the audio owner
+4. User is redirected to their dashboard
+
+---
+
+
+## 🤝 Contributing
+
+Feel free to open issues or pull requests. Suggestions, improvements, or feature ideas are always welcome!
+
+---
+
+## 📃 License
+
+This project is licensed under the MIT License.  
+© 2025 Muthres Gurjar
+
+---
