@@ -1,31 +1,27 @@
 'use client';
 
-
-import { loginWithGoogle } from '../firebase/login';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { auth } from '../firebase/index'; // Make sure this matches your actual path
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Home() {
   const router = useRouter();
 
-
-  const handleLogin = async () => {
-    const success = await loginWithGoogle();
-    if (success) {
-      router.push('/profile');
-    }
-  };
-
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        router.replace('/profile'); // Redirect to profile if logged in and verified
+      } else {
+        router.replace('/register'); // Otherwise, redirect to login
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div
-        onClick={handleLogin}
-        className="cursor-pointer w-80 p-6 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition duration-300"
-      >
-        <h2 className="text-xl font-bold mb-2">Login with Google</h2>
-        <p className="text-gray-600">Click this card to login</p>
-      </div>
-    </main>
+    <div className="flex items-center justify-center h-screen">
+      <p className="text-gray-600">Redirecting...</p>
+    </div>
   );
 }
